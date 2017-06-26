@@ -9976,8 +9976,9 @@ function ButtonOptions(props) {
     cursor: "pointer",
     padding: "8px",
     color: "white",
-    backgroundColor: "dimgrey",
-    borderRadius: "50%"
+    backgroundColor: "rgb(47, 47, 47)",
+    border: "3px solid red",
+    boxShadow: "1px 1px 5px rgba(0, 0, 0, 0.47)"
   };
   return _react2.default.createElement(
     'div',
@@ -9987,14 +9988,20 @@ function ButtonOptions(props) {
 }
 
 function ClearCanvas(props) {
+  var buttonStyle = {
+    display: "block",
+    float: "right",
+    border: "1px solid #840000",
+    backgroundColor: "#ff2929",
+    cursor: "pointer"
+  };
   var clear = function clear() {
-    console.log("Clear Canvas");
     props.ctx().clearRect(0, 0, props.canvas().width, props.canvas().height);
   };
   return _react2.default.createElement(
     'button',
-    { onClick: clear },
-    'Clear'
+    { style: buttonStyle, onClick: clear },
+    'Clear Canvas'
   );
 }
 
@@ -10028,28 +10035,38 @@ function StrokeCheckbox(props) {
 }
 
 function StrokeWidth(props) {
+  var strokeControlStyle = {
+    display: "flex",
+    flexDirection: "row"
+  };
+  var inputStyle = {
+    display: "block"
+  };
   return _react2.default.createElement(
     'div',
-    null,
+    { style: strokeControlStyle },
     _react2.default.createElement(
       'label',
       null,
       props.fixedWidth ? "Fixed" : "min",
       ' Stroke Width',
-      _react2.default.createElement('input', { name: 'minWidth', type: 'range', onChange: props.handleChange, value: props.minWidth, min: '1', max: '150', step: '1' })
+      _react2.default.createElement('input', { style: inputStyle, name: 'minWidth', type: 'range',
+        onChange: props.handleChange, value: props.minWidth,
+        min: '1', max: '150', step: '1'
+      })
     ),
     !props.fixedWidth && _react2.default.createElement(
       'label',
       null,
       'max Stroke Width',
-      _react2.default.createElement('input', { name: 'maxWidth', type: 'range', onChange: props.handleChange, value: props.maxWidth, min: '1', max: '150', step: '1' })
+      _react2.default.createElement('input', { style: inputStyle, name: 'maxWidth', type: 'range',
+        onChange: props.handleChange, value: props.maxWidth,
+        min: '1', max: '150', step: '1'
+      })
     )
   );
 }
 // to-do:
-// checkbox: custom stroke width, dynamic stroke width
-// range: stroke width
-// slider: stroke width if custom
 
 function Controls(props) {
   var container = {
@@ -10058,15 +10075,23 @@ function Controls(props) {
     top: "0",
     backgroundColor: "transparent",
     width: "400px",
-    height: "300px",
+    height: "150px",
     overflow: "hidden",
     borderRadius: "0 0 5px 5px",
     display: '' + (props.display || inlineBlock)
   };
   var content = {
-    backgroundColor: "dimgrey",
+    backgroundColor: "rgb(47, 47, 47)",
+    color: "white",
+    boxSizing: "border-box",
+    boxShadow: "rgba(0, 0, 0, 0.28) 0px 1px 2px 2px",
+    fontFamily: "sans-serif",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
     width: "100%",
     height: "100%",
+    padding: "10px",
     borderRadius: "0 0 5px 5px",
     position: "absolute",
     left: '' + (props.left || 0),
@@ -10078,12 +10103,12 @@ function Controls(props) {
     _react2.default.createElement(
       'div',
       { style: content },
-      _react2.default.createElement(ClearCanvas, { ctx: props.ctx, canvas: props.canvas }),
-      _react2.default.createElement(ColorCheckbox, { checked: props.customColor, handleChange: props.handleInputChange }),
-      _react2.default.createElement(ColorPicker, { color: props.color, handleChange: props.handleInputChange }),
       _react2.default.createElement(StrokeCheckbox, { checked: props.customWidth, handleChange: props.handleInputChange }),
       _react2.default.createElement(StrokeWidth, { minWidth: props.minWidth, maxWidth: props.maxWidth,
-        fixedWidth: props.fixedWidth, handleChange: props.handleInputChange })
+        fixedWidth: props.fixedWidth, handleChange: props.handleInputChange }),
+      _react2.default.createElement(ColorCheckbox, { checked: props.customColor, handleChange: props.handleInputChange }),
+      props.customColor && _react2.default.createElement(ColorPicker, { color: props.color, handleChange: props.handleInputChange }),
+      _react2.default.createElement(ClearCanvas, { ctx: props.ctx, canvas: props.canvas })
     )
   );
 }

@@ -163,8 +163,9 @@ function ButtonOptions (props) {
     cursor: "pointer",
     padding: "8px",
     color: "white",
-    backgroundColor: "dimgrey",
-    borderRadius: "50%"
+    backgroundColor: "rgb(47, 47, 47)",
+    border: "3px solid red",
+    boxShadow: "1px 1px 5px rgba(0, 0, 0, 0.47)"
   }
   return (
     <div onClick={props.onClick} style={buttonStyle}>
@@ -174,12 +175,18 @@ function ButtonOptions (props) {
 }
 
 function ClearCanvas (props) {
+  const buttonStyle = {
+    display: "block",
+    float: "right",
+    border: "1px solid #840000",
+    backgroundColor: "#ff2929",
+    cursor: "pointer"
+  }
   const clear = () => {
-    console.log("Clear Canvas")
     props.ctx().clearRect(0, 0, props.canvas().width, props.canvas().height)
   }
   return (
-    <button onClick={clear}>Clear</button>
+    <button style={buttonStyle} onClick={clear}>Clear Canvas</button>
   )
 }
 
@@ -211,25 +218,35 @@ function StrokeCheckbox (props) {
 }
 
 function StrokeWidth (props) {
+  const strokeControlStyle = {
+    display: "flex",
+    flexDirection: "row"
+  }
+  const inputStyle = {
+    display: "block"
+  }
   return (
-    <div>
+    <div style={strokeControlStyle}>
       <label>
       {props.fixedWidth ? "Fixed" : "min"} Stroke Width
-      <input name="minWidth" type="range" onChange={props.handleChange} value={props.minWidth} min="1" max="150" step="1"/>
+      <input style={inputStyle} name="minWidth" type="range"
+        onChange={props.handleChange} value={props.minWidth}
+        min="1" max="150" step="1"
+      />
       </label>
       {!props.fixedWidth && (
         <label>
         max Stroke Width
-        <input name="maxWidth" type="range" onChange={props.handleChange} value={props.maxWidth} min="1" max="150" step="1"/>
+        <input style={inputStyle} name="maxWidth" type="range"
+          onChange={props.handleChange} value={props.maxWidth}
+          min="1" max="150" step="1"
+        />
         </label>
       )}
     </div>
   )
 }
 // to-do:
-// checkbox: custom stroke width, dynamic stroke width
-// range: stroke width
-// slider: stroke width if custom
 
 function Controls (props) {
   const container = {
@@ -238,15 +255,23 @@ function Controls (props) {
     top: "0",
     backgroundColor: "transparent",
     width: "400px",
-    height: "300px",
+    height: "150px",
     overflow: "hidden",
     borderRadius: "0 0 5px 5px",
     display: `${props.display || inlineBlock}`
   }
   const content = {
-    backgroundColor: "dimgrey",
+    backgroundColor: "rgb(47, 47, 47)",
+    color: "white",
+    boxSizing: "border-box",
+    boxShadow: "rgba(0, 0, 0, 0.28) 0px 1px 2px 2px",
+    fontFamily: "sans-serif",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
     width: "100%",
     height: "100%",
+    padding: "10px",
     borderRadius: "0 0 5px 5px",
     position: "absolute",
     left: `${props.left || 0}`,
@@ -259,7 +284,9 @@ function Controls (props) {
         <StrokeWidth minWidth={props.minWidth} maxWidth={props.maxWidth}
         fixedWidth={props.fixedWidth} handleChange={props.handleInputChange} />
         <ColorCheckbox checked={props.customColor} handleChange={props.handleInputChange}/>
-        <ColorPicker color={props.color} handleChange={props.handleInputChange}/>
+        {props.customColor &&
+          <ColorPicker color={props.color} handleChange={props.handleInputChange}/>
+        }
         <ClearCanvas ctx={props.ctx} canvas={props.canvas}/>
       </div>
     </div>
