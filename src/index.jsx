@@ -1,6 +1,5 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Nouislider from 'react-nouislider'
 
 class RainbowCanvas extends React.Component {
   constructor(props) {
@@ -14,7 +13,10 @@ class RainbowCanvas extends React.Component {
       controlDisplay: "none",
       controlLeft: "100%",
       customColor: false,
-      color: "#000000"
+      color: "#000000",
+      customStroke: false,
+      maxWidth: 100,
+      minWidth: 5
     },
     this.draw = this.draw.bind(this),
     this.handleWidth = this.handleWidth.bind(this),
@@ -37,7 +39,7 @@ class RainbowCanvas extends React.Component {
     ctx.strokeStyle = "#BADA55";
     ctx.lineJoin = "round";
     ctx.lineCap = "round";
-    ctx.lineWidth = 5;
+    ctx.lineWidth = Number(this.state.minWidth) + 1;
   }
   draw(e) {
     const ctx = this.ctx();
@@ -62,13 +64,16 @@ class RainbowCanvas extends React.Component {
         lastX: e.nativeEvent.offsetX,
         lastY: e.nativeEvent.offsetY
       })
-      this.handleWidth(e);
+      if(!this.state.customStroke) {
+        this.handleWidth(e);
+      }
+
     }
   }
   handleWidth(e) {
     const ctx = this.canvas().getContext("2d");
     let nextState = this.state.direction;
-    if(ctx.lineWidth >= 100 || ctx.lineWidth <= 4) {
+    if(ctx.lineWidth >= this.state.maxWidth || ctx.lineWidth <= this.state.minWidth) {
       nextState = !this.state.direction;
       this.setState({
         direction: nextState
@@ -108,6 +113,16 @@ class RainbowCanvas extends React.Component {
     this.setState({
       [name]: value
     })
+
+    if(name === "minWidth" || name === "maxWidth") {
+      this.ctx().lineWidth = Number(this.state.minWidth) + 1
+      console.log(this.ctx().lineWidth)
+    }
+    if(name === "customStroke" && value === true) {
+      this.ctx().lineWidth = this.state.minWidth
+    } else if(name === "customStroke" && value === false){
+      this.ctx().lineWidth = Number(this.state.minWidth) + 1
+    }
   }
   render () {
 
@@ -129,8 +144,10 @@ class RainbowCanvas extends React.Component {
         } onMouseOut={
           () => this.setState({isDrawing: false})
         } style={canvasStyle}/>
-        <Controls left={this.state.controlLeft} display={this.state.controlDisplay} canvas={this.canvas} ctx={this.ctx}
-          color={this.state.color} customColor={this.state.customColor} handleInputChange={this.handleInputChange}/>
+        <Controls left={this.state.controlLeft} display={this.state.controlDisplay} canvas={this.canvas}
+        ctx={this.ctx} color={this.state.color} customColor={this.state.customColor}
+        handleInputChange={this.handleInputChange} maxWidth={this.state.maxWidth} minWidth={this.state.minWidth}
+        fixedWidth={this.state.customStroke}/>
         <ButtonOptions onClick={this.toggleControls}/>
       </div>
     )
@@ -187,7 +204,7 @@ function StrokeCheckbox (props) {
     <div>
       <label>
         <input name="customStroke" type="checkbox" onChange={props.handleChange} value={props.checked} />
-        Custom Stroke Width
+        Fixed Stroke Width
       </label>
     </div>
   )
@@ -195,7 +212,18 @@ function StrokeCheckbox (props) {
 
 function StrokeWidth (props) {
   return (
-    <Nouislider range={{min: 5, max: 200}} start={[5, 100]} tooltips/>
+    <div>
+      <label>
+      {props.fixedWidth ? "Fixed" : "min"} Stroke Width
+      <input name="minWidth" type="range" onChange={props.handleChange} value={props.minWidth} min="1" max="150" step="1"/>
+      </label>
+      {!props.fixedWidth && (
+        <label>
+        max Stroke Width
+        <input name="maxWidth" type="range" onChange={props.handleChange} value={props.maxWidth} min="1" max="150" step="1"/>
+        </label>
+      )}
+    </div>
   )
 }
 // to-do:
@@ -210,7 +238,7 @@ function Controls (props) {
     top: "0",
     backgroundColor: "transparent",
     width: "400px",
-    height: "80px",
+    height: "300px",
     overflow: "hidden",
     borderRadius: "0 0 5px 5px",
     display: `${props.display || inlineBlock}`
@@ -227,10 +255,12 @@ function Controls (props) {
   return (
     <div style={container}>
       <div style={content}>
-        <ClearCanvas ctx={props.ctx} canvas={props.canvas}/>
+        <StrokeCheckbox checked={props.customWidth} handleChange={props.handleInputChange} />
+        <StrokeWidth minWidth={props.minWidth} maxWidth={props.maxWidth}
+        fixedWidth={props.fixedWidth} handleChange={props.handleInputChange} />
         <ColorCheckbox checked={props.customColor} handleChange={props.handleInputChange}/>
         <ColorPicker color={props.color} handleChange={props.handleInputChange}/>
-        <StrokeWidth />
+        <ClearCanvas ctx={props.ctx} canvas={props.canvas}/>
       </div>
     </div>
   )
